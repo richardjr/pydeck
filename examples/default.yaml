@@ -24,9 +24,27 @@ pages:
               type: command
               value: "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ 0"
 
-      5:
+      2:
+        icon: chromium.png
+        action:
+          type: command
+          value: "hyprctl dispatch focuswindow class:chromium || chromium &"
+
+      3:
         icon: lemmings-walk.gif
         pressed_icon: lemmings-explode.gif
         action:
           type: command
           value: "killall firefox Discord"
+
+      4:
+        icon: firefox.png
+        action:
+          type: command
+          value: "hyprctl dispatch focuswindow class:firefox || firefox &"
+
+      5:
+        icon: steam.png
+        action:
+          type: command
+          value: "hyprctl dispatch focuswindow class:steam || steam &"
