@@ -1,0 +1,42 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "pydeck"
+version = "0.1.0"
+description = "A Python-based Stream Deck client"
+requires-python = ">=3.11"
+dependencies = [
+    "streamdeck>=0.9.5",
+    "Pillow>=10.0",
+    "PyYAML>=6.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "ruff",
+    "mypy",
+    "types-PyYAML",
+    "types-Pillow",
+]
+
+[project.scripts]
+pydeck = "pydeck.cli:main"
+
+[tool.ruff]
+target-version = "py311"
+src = ["src"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+
+[[tool.mypy.overrides]]
+module = "StreamDeck.*"
+ignore_missing_imports = true
