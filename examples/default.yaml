@@ -10,13 +10,23 @@ pages:
         action:
           type: command
           value: "playerctl play-pause"
+
       1:
-        icon: mic-mute.png
+        states:
+          - name: unmuted
+            icon: mic-on.png
+            action:
+              type: command
+              value: "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ 1"
+          - name: muted
+            icon: mic-mute.png
+            action:
+              type: command
+              value: "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ 0"
+
+      5:
+        icon: lemmings-walk.gif
+        pressed_icon: lemmings-explode.gif
         action:
           type: command
-          value: "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"
-      5:
-        icon: custom.png
-        action:
-          type: plugin
-          value: "example_plugin:on_press"
+          value: "killall firefox Discord"

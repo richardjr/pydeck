@@ -35,19 +35,36 @@ def _resolve_path(base_dir: Path, value: str) -> str:
     return str(p)
 
 
+def _resolve_icon(icons_dir: str, icon: str) -> str:
+    icon_path = Path(icon)
+    if not icon_path.is_absolute():
+        icon_path = Path(icons_dir) / icon_path
+    return str(icon_path)
+
+
+def _validate_action(action: object) -> dict[str, str]:
+    if not isinstance(action, dict):
+        raise ValueError("action must be a mapping")
+    action_type = action.get("type")
+    if action_type not in VALID_ACTION_TYPES:
+        raise ValueError(
+            f"action type must be one of {VALID_ACTION_TYPES}, got {action_type!r}"
+        )
+    if "value" not in action:
+        raise ValueError("action must have a 'value' field")
+    return {"type": action_type, "value": action["value"]}
+
+
 def _validate_config(raw: dict, config_path: Path) -> PydeckConfig:  # type: ignore[type-arg]
     config_dir = config_path.parent
     config: PydeckConfig = {}
 
-    # Resolve plugin_dir
     plugin_dir = raw.get("plugin_dir", str(config_dir / "plugins"))
     config["plugin_dir"] = _resolve_path(config_dir, plugin_dir)
 
-    # Resolve icons_dir
     icons_dir = raw.get("icons_dir", str(config_dir / "icons"))
     config["icons_dir"] = _resolve_path(config_dir, icons_dir)
 
-    # Validate pages
     pages = raw.get("pages", [])
     if not isinstance(pages, list) or len(pages) == 0:
         raise ValueError("Config must have at least one page")
@@ -92,23 +109,38 @@ def _validate_page(page: dict, icons_dir: str) -> dict:  # type: ignore[type-arg
 def _validate_button(button: dict, icons_dir: str) -> dict:  # type: ignore[type-arg]
     result: dict = {}  # type: ignore[type-arg]
 
-    if "icon" in button:
-        icon_path = Path(button["icon"])
-        if not icon_path.is_absolute():
-            icon_path = Path(icons_dir) / icon_path
-        result["icon"] = str(icon_path)
+    has_states = "states" in button
+    has_icon = "icon" in button
+
+    if has_states and has_icon:
+        raise ValueError("Button cannot have both 'icon' and 'states'")
+
+    if has_states:
+        states = button["states"]
+        if not isinstance(states, list) or len(states) < 2:
+            raise ValueError("'states' must be a list with at least 2 entries")
+        validated_states = []
+        for state in states:
+            if not isinstance(state, dict):
+                raise ValueError("Each state must be a mapping")
+            s: dict = {}  # type: ignore[type-arg]
+            if "name" in state:
+                s["name"] = str(state["name"])
+            if "icon" in state:
+                s["icon"] = _resolve_icon(icons_dir, state["icon"])
+            if "action" in state:
+                s["action"] = _validate_action(state["action"])
+            validated_states.append(s)
+        result["states"] = validated_states
+        return result
+
+    if has_icon:
+        result["icon"] = _resolve_icon(icons_dir, button["icon"])
+
+    if "pressed_icon" in button:
+        result["pressed_icon"] = _resolve_icon(icons_dir, button["pressed_icon"])
 
     if "action" in button:
-        action = button["action"]
-        if not isinstance(action, dict):
-            raise ValueError("action must be a mapping")
-        action_type = action.get("type")
-        if action_type not in VALID_ACTION_TYPES:
-            raise ValueError(
-                f"action type must be one of {VALID_ACTION_TYPES}, got {action_type!r}"
-            )
-        if "value" not in action:
-            raise ValueError("action must have a 'value' field")
-        result["action"] = {"type": action_type, "value": action["value"]}
+        result["action"] = _validate_action(button["action"])
 
     return result

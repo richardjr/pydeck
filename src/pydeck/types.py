@@ -9,9 +9,17 @@ class ActionConfig(TypedDict):
     value: str
 
 
-class ButtonConfig(TypedDict, total=False):
+class StateConfig(TypedDict, total=False):
+    name: str
     icon: str
     action: ActionConfig
+
+
+class ButtonConfig(TypedDict, total=False):
+    icon: str
+    pressed_icon: str
+    action: ActionConfig
+    states: list[StateConfig]
 
 
 class PageConfig(TypedDict, total=False):

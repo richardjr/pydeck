@@ -1,6 +1,6 @@
 # pydeck
 
-A Python-based Stream Deck Mini client for Linux. Maps the 6 buttons to shell commands, scripts, or Python plugins via a YAML config.
+A Python-based Stream Deck Mini client for Linux. Maps the 6 buttons to shell commands, scripts, or Python plugins via a YAML config. Supports stateful toggle buttons and animated GIF icons.
 
 ## Prerequisites
 
@@ -58,21 +58,34 @@ pages:
   - name: main
     brightness: 80
     buttons:
+      # Simple button — static icon, single action
       0:
         icon: play-pause.png
         action:
           type: command
           value: "playerctl play-pause"
+
+      # Stateful toggle — cycles through states on each press
       1:
-        icon: mic-mute.png
+        states:
+          - name: unmuted
+            icon: mic-on.png
+            action:
+              type: command
+              value: "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ 1"
+          - name: muted
+            icon: mic-mute.png
+            action:
+              type: command
+              value: "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ 0"
+
+      # Animated button — looping GIF, one-shot press animation
+      5:
+        icon: lemmings-walk.gif
+        pressed_icon: lemmings-explode.gif
         action:
           type: command
-          value: "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"
-      5:
-        icon: custom.png
-        action:
-          type: plugin
-          value: "example_plugin:on_press"
+          value: "killall firefox Discord"
 ```
 
 Button indices map to a 2x3 grid:
@@ -81,6 +94,14 @@ Button indices map to a 2x3 grid:
 [0] [1] [2]
 [3] [4] [5]
 ```
+
+### Button types
+
+**Simple** — An `icon` (PNG or GIF) and an `action`. Press triggers the action.
+
+**Stateful** — A `states` list (2+). Each state has its own `icon` and `action`. Press executes the current state's action, then advances to the next state. Useful for toggles like mute/unmute.
+
+**Press animation** — A button with `pressed_icon`. On press, plays the pressed icon (typically a one-shot GIF), then returns to the default `icon`. Combine with `action` to run a command at the same time.
 
 ### Action types
 
@@ -92,7 +113,10 @@ Button indices map to a 2x3 grid:
 
 ### Icons
 
-Place 80x80 PNG files in `icons_dir`. Relative paths in the config resolve against `icons_dir`. Missing icons show as blank keys.
+Place icons in `icons_dir`. Relative paths in the config resolve against `icons_dir`. Missing icons show as blank keys.
+
+- **PNG** — Static 80x80 images
+- **GIF** — Animated, frame durations are preserved. Looping GIFs loop continuously; one-shot GIFs (used as `pressed_icon`) play once then revert.
 
 ## Plugins
 

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**pydeck** is a Python-based Stream Deck Mini client for Linux. It loads a YAML config that maps the 6 buttons (2x3 grid, 80x80px icons) to shell commands, scripts, or Python plugins.
+**pydeck** is a Python-based Stream Deck Mini client for Linux. It loads a YAML config that maps the 6 buttons (2x3 grid, 80x80px icons) to shell commands, scripts, or Python plugins. Supports stateful toggle buttons and animated GIF icons.
 
 ## Language & Tooling
 
@@ -32,10 +32,11 @@ Flat module design — no class hierarchies. Data flows through TypedDicts and d
 |---|---|
 | `cli.py` | Entry point, argparse, signal handlers, main loop |
 | `config.py` | YAML loading, validation, path resolution |
-| `deck.py` | Device discovery, image application, key callbacks |
+| `deck.py` | Device discovery, image application, key callbacks, state management |
 | `actions.py` | Action dispatch: command, script, plugin |
 | `plugins.py` | importlib-based plugin loader with caching |
-| `images.py` | PNG loading, resize via StreamDeck PILHelper |
+| `images.py` | PNG/GIF loading, resize via StreamDeck PILHelper |
+| `animations.py` | AnimationManager — background thread cycling GIF frames |
 | `types.py` | TypedDicts for config, PluginContext dataclass |
 
 ## Config
@@ -43,6 +44,14 @@ Flat module design — no class hierarchies. Data flows through TypedDicts and d
 Default location: `~/.config/pydeck/default.yaml`. Override with `--config`.
 Button indices 0-5 map to a 2x3 grid: `[0][1][2]` / `[3][4][5]`.
 Action types: `command` (shell), `script` (executable path), `plugin` (module:function).
+
+### Button types
+
+- **Simple**: `icon` + `action` — static or animated icon, single action
+- **Stateful**: `states` list — cycles through states on press, each with own icon/action
+- **Press animation**: `pressed_icon` — plays a one-shot animation on press, then returns to default icon
+
+Icons can be PNG (static) or GIF (animated). GIF frame durations are preserved.
 
 ## System Setup (Arch)
 
