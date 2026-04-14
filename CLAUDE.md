@@ -2,6 +2,13 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Project notes
+
+Planning, open tasks, decisions, and meeting notes live in the Obsidian vault:
+`/home/richard/Work/Obsidian/projects/pydeck/pydeck.md`
+
+**Claude: read that file at the start of a session for current status and open tasks.** See `/home/richard/Work/Obsidian/CLAUDE.md` for vault conventions.
+
 ## Project Overview
 
 **pydeck** is a Python-based Stream Deck Mini client for Linux. It loads a YAML config that maps the 6 buttons (2x3 grid, 80x80px icons) to shell commands, scripts, or Python plugins. Supports stateful toggle buttons and animated GIF icons.
