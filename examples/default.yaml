@@ -9,7 +9,7 @@ pages:
         icon: play-pause.png
         action:
           type: command
-          value: "playerctl play-pause"
+          value: "omarchy-shell media playPause"
 
       1:
         states:
