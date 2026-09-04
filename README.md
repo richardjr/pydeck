@@ -63,7 +63,7 @@ pages:
         icon: play-pause.png
         action:
           type: command
-          value: "playerctl play-pause"
+          value: "omarchy-shell media playPause"
 
       # Stateful toggle — cycles through states on each press
       1:
@@ -107,9 +107,11 @@ Button indices map to a 2x3 grid:
 
 | Type | Value | Description |
 |---|---|---|
-| `command` | Shell command string | Runs via shell (e.g. `playerctl play-pause`) |
+| `command` | Shell command string | Runs via shell (e.g. `omarchy-shell media playPause`) |
 | `script` | Path to executable | Runs directly (e.g. `~/.config/pydeck/scripts/toggle.sh`) |
 | `plugin` | `module:function` | Calls a Python function from `plugin_dir` |
+
+The play/pause example uses `omarchy-shell media playPause`, which drives the Omarchy 4 shell's media plugin over MPRIS. Omarchy 4 dropped `playerctl` from its default package set, so on other desktops install `playerctl` and use `playerctl play-pause` instead.
 
 ### Icons
 
